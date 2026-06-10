@@ -1,0 +1,12 @@
+---
+- name: phase5-observability deployment
+  hosts: all
+  become: true
+  roles:
+    - prometheus
+    - grafana
+    - alertmanager
+    - loki
+    - elasticsearch
+    - kibana
+    - fluentbit

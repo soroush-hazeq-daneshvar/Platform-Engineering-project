@@ -1,0 +1,72 @@
+---
+- name: Ensure SSH server is installed
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+
+- name: Ensure SSH service is enabled and running
+  ansible.builtin.service:
+    name: ssh
+    state: started
+    enabled: true
+
+- name: Config /etc/ssh/sshd_config to allow only key-based authentication
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    state: present
+
+- name: Permit root login via SSH
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: 'PermitRootLogin prohibit-password'
+    state: present
+
+- name: PubkeyAuthentication yes
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^PubkeyAuthentication'
+    line: 'PubkeyAuthentication yes'
+    state: present
+
+- name: AllowUsers admin
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowUsers'
+    line: 'AllowUsers admin'
+    state: present
+
+- name: ClientAliveInterval
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^ClientAliveInterval'
+    line: 'ClientAliveInterval 300'
+    state: present
+
+- name: ClientAliveCountMax
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^ClientAliveCountMax'
+    line: 'ClientAliveCountMax 0'
+    state: present
+
+- name: MaxAuthTries
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^MaxAuthTries'
+    line: 'MaxAuthTries 3'
+    state: present
+
+- name: Custom ssh port
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^Port'
+    line: 'Port 8822'
+    state: present
+
+- name: Restart SSH service to apply changes
+  ansible.builtin.service:
+    name: ssh
+    state: restarted

@@ -1,0 +1,36 @@
+---
+- name: Install chrony package
+  ansible.builtin.package:
+    name: chrony
+    state: present
+
+- name: Ensure chrony service is enabled and running
+  ansible.builtin.service:
+    name: chrony
+    state: started
+    enabled: true
+
+- name: Config /etc/chrony/chrony.conf to use NTP servers
+  ansible.builtin.lineinfile:
+    dest: /etc/chrony/chrony.conf
+    regexp: '^server'
+    line: 'server time.google.com iburst'
+    state: present
+
+- name: Timezone sync with timedatectl
+  ansible.builtin.lineinfile:
+    dest: /etc/chrony/chrony.conf
+    line: 'timezone Iran/Tehran'
+    state: present
+
+- name: Drift correction
+  ansible.builtin.lineinfile:
+    dest: /etc/chrony/chrony.conf
+    regexp: '^driftfile'
+    line: 'driftfile /var/lib/chrony/chrony.drift'
+    state: present
+
+- name: Restart chrony service
+  ansible.builtin.service:
+    name: chrony
+    state: restarted

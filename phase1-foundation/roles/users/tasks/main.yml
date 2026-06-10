@@ -1,0 +1,31 @@
+---
+- name: Create admin user
+  ansible.builtin.user:
+    name: admin
+    password: "{{ 'admin' | password_hash('sha512') }}"
+    shell: /bin/bash
+    state: present
+    groups: sudo
+    append: true
+
+- name: Allow sudo without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL:ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+
+- name: Create SSH directory
+  ansible.builtin.file:
+    path: /home/admin/.ssh
+    state: directory
+    owner: admin
+    group: admin
+    mode: "0700"
+
+- name: Install public key
+  ansible.builtin.authorized_key:
+    user: admin
+    state: present
+    key: "{{ lookup('file', role_path + '/files/admin_id_rsa.pub') }}"

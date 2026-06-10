@@ -1,0 +1,51 @@
+---
+- name: Install nftables package
+  ansible.builtin.package:
+    name: nftables
+    state: present
+
+- name: Ensure nftables service is enabled and running
+  ansible.builtin.service:
+    name: nftables
+    state: started
+    enabled: true
+
+- name: Configure nftables allow port 8822 for SSH
+  ansible.builtin.lineinfile:
+    dest: /etc/nftables.conf
+    regexp: '^\s*tcp\s*dport\s*8822\s*accept'
+    line: '    tcp dport 8822 accept'
+    state: present
+
+- name: Configure nftables allow port 53 for DNS
+  ansible.builtin.lineinfile:
+    dest: /etc/nftables.conf
+    regexp: '^\s*tcp\s*dport\s*53\s*accept'
+    line: '    tcp dport 53 accept'
+    state: present
+
+- name: Configure nftables allow port 123 for NTP
+  ansible.builtin.lineinfile:
+    dest: /etc/nftables.conf
+    regexp: '^\s*udp\s*dport\s*123\s*accept'
+    line: '    udp dport 123 accept'
+    state: present
+
+- name: Configure nftables allow internal cluster communication
+  ansible.builtin.lineinfile:
+    dest: /etc/nftables.conf
+    regexp: '^\s*ip\s*saddr\s*10\.0\.0\.0\/8\s*accept'
+    line: '    ip saddr 10.0.0.0/8 accept'
+    state: present
+
+- name: Default deny all other traffic
+  ansible.builtin.lineinfile:
+    dest: /etc/nftables.conf
+    regexp: '^\s*drop\s*'
+    line: '    drop'
+    state: present
+
+- name: Restart nftables service
+  ansible.builtin.service:
+    name: nftables
+    state: restarted

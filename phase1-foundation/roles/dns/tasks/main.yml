@@ -1,0 +1,34 @@
+---
+- name: Install systemd-resolved
+  ansible.builtin.package:
+    name: systemd-resolved
+    state: present
+
+- name: Install dnsutil
+  ansible.builtin.package:
+    name: dnsutils
+    state: present
+
+- name: Systemd-resolved is enabled and running
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: started
+    enabled: true
+
+- name: Config /etc/systemd/resolved.conf
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/resolved.conf
+    regexp: '^DNS='
+    line: 'DNS=1.1.1.1 1.0.0.1'
+    state: present
+- name: Search domain google.com
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/resolved.conf
+    regexp: '^Domains='
+    line: 'Domains=google.com'
+    state: present
+
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted

@@ -1,0 +1,12 @@
+---
+- name: Phase1-foundation deployment
+  hosts: all
+  become: true
+  roles:
+    - role: common
+    - role: users
+    - role: ssh
+    - role: dns
+    - role: ntp
+    - role: firewall
+    - role: kernel

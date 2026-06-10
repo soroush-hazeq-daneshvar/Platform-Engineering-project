@@ -1,0 +1,11 @@
+---
+- name: phase4-devops deployment
+  hosts: all
+  become: true
+  roles:
+    - gitlab
+    - gitlab-runner
+    - harbor
+    - argocd
+    - sonarqube
+    - nexus

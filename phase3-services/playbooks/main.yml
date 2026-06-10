@@ -1,0 +1,10 @@
+---
+- name: phase3-services deployment
+  hosts: all
+  become: true
+  roles:
+    - ceph
+    - minio
+    - postgres
+    - redis
+    - rabbitmq

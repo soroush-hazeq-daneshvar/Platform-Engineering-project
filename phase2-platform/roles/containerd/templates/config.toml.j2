@@ -1,0 +1,36 @@
+version = 2
+
+[plugins."io.containerd.grpc.v1.cri"]
+  sandbox_image = "{{ containerd_pause_image | default('registry.k8s.io/pause:3.10') }}"
+
+  # Important for Kubernetes networking stability
+  stream_server_address = "127.0.0.1"
+  stream_server_port = "0"
+
+  # CRI defaults
+  enable_selinux = false
+  enable_unprivileged_ports = true
+  enable_unprivileged_icmp = true
+
+[plugins."io.containerd.grpc.v1.cri".containerd]
+  default_runtime_name = "runc"
+
+  # snapshotter (modern best practice)
+  snapshotter = "overlayfs"
+
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+  runtime_type = "io.containerd.runc.v2"
+
+[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+  SystemdCgroup = true
+
+[plugins."io.containerd.grpc.v1.cri".cni]
+  # Kubernetes-managed CNI (Cilium in your case)
+  bin_dir = "/opt/cni/bin"
+  conf_dir = "/etc/cni/net.d"
+
+[metrics]
+  address = "127.0.0.1:1338"
+
+[debug]
+  level = "info"

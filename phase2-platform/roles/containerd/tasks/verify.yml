@@ -1,0 +1,16 @@
+---
+- name: Verify containerd service
+  ansible.builtin.systemd:
+    name: containerd
+    state: started
+  register: containerd_service
+
+- name: Verify containerd binary
+  ansible.builtin.command:
+    cmd: containerd --version
+  register: containerd_version
+  changed_when: false
+
+- name: Display version
+  ansible.builtin.debug:
+    msg: "{{ containerd_version.stdout }}"

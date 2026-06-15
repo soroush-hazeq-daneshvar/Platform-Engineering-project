@@ -1,57 +1,19 @@
 ---
-- name: Create keyrings directory
+- name: Create containerd configuration directory
   ansible.builtin.file:
-      path: /etc/apt/keyrings
-      state: directory
-      mode: '0755'
-
-- name: Download Docker GPG key
-  ansible.builtin.get_url:
-      url: https://download.docker.com/linux/ubuntu/gpg
-      dest: /etc/apt/keyrings/docker.asc
-      mode: '0644'
-      force: true
-
-- name: De-armor Docker GPG key for APT
-  ansible.builtin.command:
-      command: gpg --dearmor --yes --output /etc/apt/keyrings/docker.gpg /etc/apt/keyrings/docker.asc
-      args:
-      creates: /etc/apt/keyrings/docker.gpg
-
-- name: Add Docker repository
-  ansible.builtin.apt_repository:
-      repo: "deb [signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
-      state: present
-      filename: docker
-
-- name: Update OS - Debian - Ubuntu
-  ansible.builtin.apt:
-      update_cache: true
-      cache_valid_time: 3600
-
-- name: Install Containerd.IO and other prerequitite tools
-  ansible.builtin.package:
-      name:
-          - containerd.io
-          - runc
-          - iptables
-          - ipset
-          - ipvsadm
-          - conntrack
-          - socat
-          - ethtool
-          - ebtables
-          - nfs-common
-          - open-iscsi
-      state: present
-- name: Enable boot start of Containe;rd.io
+    path: /etc/containerd
+    state: directory
+    mode: "0755"
+- name: Deploy containerd configuration
+  ansible.builtin.template:
+    src: config.toml.j2
+    dest: /etc/containerd/config.toml
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart containerd
+- name: Enable and start containerd
   ansible.builtin.systemd_service:
-      name: containerd
-      enabled: true
-      state: started
-
-- name: Crete default config for containerd
-  ansible.builtin.command:
-      command: containerd config default > /etc/containerd/config.toml
-      args:
-      creates: etc/containerd/config.toml
+    name: containerd
+    enabled: true
+    state: started

@@ -1,0 +1,15 @@
+---
+- name: Configure kernel modules
+  ansible.builtin.import_tasks: kernel_modules.yml
+
+- name: Configure sysctl
+  ansible.builtin.import_tasks: sysctl.yml
+
+- name: Install packages
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Configure containerd
+  ansible.builtin.import_tasks: containerd.yml
+
+- name: Verify installation
+  ansible.builtin.import_tasks: verify.yml

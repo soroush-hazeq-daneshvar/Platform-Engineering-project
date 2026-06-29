@@ -1,0 +1,16 @@
+---
+- name: Configure sysctl parameters for containerd
+  ansible.builtin.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  loop:
+    - { key: 'net.bridge.bridge-nf-call-iptables', value: 1 }
+    - { key: 'net.bridge.bridge-nf-call-ip6tables', value: 1 }
+    - { key: 'net.ipv4.ip_forward', value: 1 }
+
+- name: persist sysctl parameters
+  ansible.builtin.command:
+    cmd: sysctl --system
+  changed_when: false
